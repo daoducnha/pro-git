@@ -1,0 +1,204 @@
+Spring:
+
+todo	research ve ControllerAdvice + ExceptionHandler
+done	return type la CompletableFuture
+-done 	research Future: https://www.baeldung.com/java-future
+
+
+
+------------------------------------------------Git------------------------------------------------
+
+
+Chap1 
+ 	- every time you commit, or save the state of your roject, Git basically takes a picture of what all your files look like at that moment and stores a reference to that snapshot. 
+	- if files have not changed Git just a link to the previous identical file it has already stored.
+	- data more like a stream of snapshots.
+	-  Git stores everything in its database not by file name but by the hash value of its contents.
+
+	- three main states:  
+		modified: changed the file but have not committed
+		staged: marked a modified file in its current version to go into your next commit snapshot
+		committed:  data is safely stored in your local database
+chap 2: Git Basics
+	file can be in one of two states: 
+		- tracked:  files that were in the last snapshot; they can be unmodified, modified,or staged
+		- untracked:  everything else. Files not in your last snapshot and are not in your staging area
+					 Untracked basically means that Git sees a file you didn’t have in the previous snapshot  (commit);
+	- Checking the Status of Your Files: git status
+	- Tracking New Files:  git add
+	- Staging Modified Files: git add
+			you use it to begin tracking new files
+			to stage files
+			marking merge-conflicted files as resolved
+			“add precisely this content to the next commit” rather than “add this file to the project”.
+			 If you modify a file after you run git add, you have to run git add again to stage the latest version of the file
+ 	- Ignoring Files:
+		.gitignore
+	- Viewing Your Staged and Unstaged Changes:
+		git diff: 
+			+  What have you changed but not yet staged
+			+  what have you staged that you are about to commit
+			+ doesn’t show all changes made since your last commit — only changes that are still unstaged
+	- Committing Your Changes: git commit
+	- Skipping the Staging Area:  git commit -a 
+		- sometimes this flag will cause you to include unwanted changes
+	- Removing Files:  git rm
+		-	Remove it from your tracked files and then commit
+		-  want to do is to keep the file in your working tree but remove it from your staging area: git rm --cached  <=> write in .gitignore file
+	- Viewing the Commit History:  git log
+		- the most recent commits show up first.
+		- Option
+			+ -p or --patch, which shows the difference (the patch output) introduced in each commit 
+			+ -<number>:  show only number the last two entries commit
+			+  --stat: o see some abbreviated stats for each commit (modified files, how many files were changed, and how many lines in those files were added and removed.)
+			+ --pretty: changes the log output to formats like (oneline, short, full, fuller) or format:"%h - %an, %ar : %s"
+			+ --graph.: 
+	- Undoing Things: git commit --amend
+		- run this command immediately after your previous commit -> change is your commit message
+		- if you commit and then realize you forgot to stage the changes in a file you wanted to add to this commit, you can do something like this: 
+				$ git commit -m 'initial commit'
+				$ git add forgotten_file
+				$ git commit --amend
+			=> amending your last commit, the second commit replaces the results of the first
+			not so much fixing it as replacing it entirely with a new=> pushes the old commit out of the way and puts the new commit in its place.
+	- Unstaging a Staged File: git reset HEAD <file_name>
+	- Unmodifying a Modified File:  git checkout -- CONTRIBUTING.md (nguy hiem khong nen dung)
+	-  anything that is committed in Git can almost always be recovered. However, anything you lose that was never committed is likely never to be seen again.
+	Fetching and Pulling from Your Remotes:
+		git fetch <remote>
+			- git fetch command only downloads the data to your local repository — it doesn’t automatically merge it with any of your work or modify what you’re currently working on
+		 git pull command to automatically fetch and then merge that remote branch into your current branch
+	Tagging
+		- Listing Your Tags:  git tag/  git tag -l 
+		- Creating Tags: 
+			- two types:  
+				+ lightweight:    like a branch that doesn’t change,  it’s just a pointer to a specific commit 
+							 if you want a temporary tag or for some reason don’t want to keep the other information
+							To create a lightweight tag, don’t supply any of the -a, -s, or -m options, just provide a tag name:  git tag v1.4-lw
+				+ annotated:    - stored as full objects in the Git database, contain the tagger name, email, and date; have a tagging message,....
+							- cmd: git tag -a v1.4 -m "my version 1.4"
+Chap 3 Git Branching
+	Git stores that version of the file in the Git repository (Git refers to them as blobs), and adds that checksum to the staging area
+	
+		blobs:  representing the contents of one of the three files
+		tree that lists the contents of the directory and specifies which file names are stored as which blobs
+		one commit with the pointer to that root tree and all the commit metadata
+	Creating a New Branch  creates a new pointer for you to move around
+	A branch in Git is simply a lightweight movable pointer to one of these commits.
+	HEAD:  pointer to the local branch you’re currently on
+	Creating a New Branch:  git branch testing (command only created a new branch )
+	 shows you where the branch pointers are pointing:  use option --decorate in git log command
+	changes are isolated in separate branches
+	Because the commit on the branch you’re on isn’t a direct ancestor of the branch you’re merging in,
+		three-way merge(Hợp nhất 3 chiều): 
+			using the two snapshots pointed to by the branch tips and the common
+			Git creates a new snapshot that results from this three-way merge and automatically creates a new commit that points to it
+	Basic Merge Conflicts:
+		It has paused the process while you resolve the conflict.
+		<<<<<<< HEAD:index.html:    This means the version in HEAD 
+
+	Branch Management:
+		 git branch
+		options:
+				-  -v: To see the last commit on each branch
+				-  --merged and --no-merged + [branch name]: filter this list to branches that you have or have not yet merged into the branch you’re currently on
+				-  -vv:  tracking branches you have set up
+	Remote-tracking branches:
+		 references to the state of remote branches				
+	 synchronize your work with a given remote, you run a git fetch <remote> command => updates your local database, moving your origin/master pointer to its new, more up-to-date position
+	git fetch origin => khong co san nhung branch tren remote o local maf chi co pointer cua <remote>/<branch> va khong co the chinh sua chung
+	neu muon co => run cmd:  git checkout -b serverfix origin/serverfix
+	Tracking Branches (upstream branch): 
+		Checking out a local branch from a remote-tracking branch automatically creates 
+		direct relationship to a remote branch
+	Rebasing: git rebase
+		 take all the changes that were committed on one branch and replay them on a different branch
+		Option:
+			 --onto: 
+		when rebase you’re abandoning existing commits and creating new ones that are similar but different
+		git pull --rebase <=>  git fetch followed by a git rebase teamone/master 
+Chap 3:
+	git log --no-merges issue54..origin/master
+		issue54..origin/master:  log filter that asks Git to display only those commits that are on the latter branch (in this case is origin/master) that are not on the first branch (in this case issue54).
+	git push -u origin featureB:featureBee: 
+		-u flag; this is short for --set-upstream, which configures the branches for easier pushing and pulling later
+
+Chap 4: Git tools
+	1 Revision Selection:
+		Single commit:
+			- git show [commit-number]
+			- git show [branch-name]
+		RefLog Shortnames:
+			reflog: 	a log of where your HEAD and branch references have been for the last few months
+					reflog as Git’s version of shell history
+					- see reflog: git reflog => list reflog
+					- show info: git show HEAD@{3}
+					- show reflog in git log with option "-g" -> git log -g
+		Ancestry References
+			see the previous commit by specifying by command: git show HEAD^ or [commit-number]^[number parent] or HEAD~[number parent]
+		Commit ranges:	
+			Double Dot syntax: This basically asks Git to resolve a range of commits that are reachable from one commit but aren’t reachable from another
+			ex: git show/log master..experiment == 'all commits reachable from experiment that aren’t reachable from master' 
+			Triple Dot: which specifies all the commits that are reachable by either of two references but not by both of them
+	2 Interactive Staging:
+	3 Stashing and Cleaning
+		- using command: git stash 
+		- reapply stash command: git stash apply  OR  git stash apply  stash@{3} (If you don’t specify a stash, Git assumes the most recent stash and tries to apply it)
+		- remove it, you can run "git stash drop" with the name of the stash to remove. Ex: git stash drop stash@{0}
+		- run "git stash pop" to apply the stash and then immediately drop it from your stack.
+		- git stash option:
+			--keep-index: not only include all staged content in the stash being created, but simultaneously leave it in the index
+			--include-untracked(-u): include untracked files in the stash being created but still not include explicitly ignored files -> to additionally include ignored files, use --all (or just -a).
+		- Creating a Branch from a Stash: git stash branch <new branchname>
+		- Cleaning your Working Directory: git clean (careful) => can use "git stash --all" to remove everything but save it in a stash
+	4 Searching
+	5 Rewriting History
+		a, Changing the Last Commit
+			modify your last commit message: git commit --amend
+			change content of last commit: 
+				- first make the changes you think you forgot, stage those changes
+				- git commit --amend 
+				- need to be careful because amending changes the SHA-1 of the commit
+				- It’s like a very small rebase — don’t amend your last commit if you’ve already pushed it.
+		b, Changing Multiple Commit Messages
+			- Can use the rebase tool to rebase a series of commits onto the HEAD
+			- run rebase interactively by adding the -i option to git rebase and must indicate how far back you want to rewrite commits 
+				ex: git rebase -i HEAD~3
+			- edit commit -> replace 'pick' to 'edit' ->  will stop at commit mark 'edit' -> edit content or edit commit message  > git commit --amend  > git rebase --continue
+			- Reordering Commits: change order commit in  > save and exit the editor
+			- Squashing Commits: change pick to squash
+			- Splitting a Commit: 
+		c, Reset Demystified
+			The Three Trees:  really mean “collection of files”
+				HEAD				Last commit snapshot, next parent
+				Index 				Proposed next commit snapshot (referring to this concept as Git’s “Staging Area”)
+				Working Directory 		Sandbox
+			The Workflow
+				Step 1, HEAD reference which points to the unborn "master"
+				Step 2, git add to take content in the working directory and copy it to the index
+				Step 3, git commit: takes the contents of the index -> saves it -> creates a commit object points to that snapshot -> updates "master" to point to that commit
+			The Role of Reset: will do is to update the index with the contents of whatever snapshot HEAD now points to
+				Step 1: Move HEAD
+					git reset 9e5e6a4 OR git reset --soft HEAD~(parent of head)
+				Step 2: Updating the Index (--mixed): make HEAD == Index
+				Step 3: Updating the Working Directory (--hard) made HEAD == Index == Working Directory
+					The third thing that reset will do is to make the working directory look like the index
+					--hard option cannot undone
+				recap: 
+					1. Move the branch HEAD points to (stop here if --soft)
+					2. Make the index look like HEAD (stop here unless --hard)
+					3. Make the working directory look like the index
+			Reset With a Path
+					git reset file.txt  <=>  git reset --mixed HEAD file.txt
+					 git reset eb43bf file.txt : specifying a specific commit to pull that file version from
+			Squashing commit:
+				You can run git reset --soft HEAD~2 to move the HEAD branch back to an older commit 
+				And then simply run git commit again
+				push force
+
+		Checkout: 
+		Merge:
+				git merge --abort.
+				git checkout --conflict : re-checkout the file again and replace the merge conflict markers
+			Undoing Merges:  git reset --hard HEAD~ => this will reset the branch pointers
+				
